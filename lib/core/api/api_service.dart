@@ -1,7 +1,10 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
-import '../models/batch.dart';
-import '../models/chat.dart';
+
+import '../../models/batch.dart';
+import '../../models/chat.dart';
+
 
 /// Single source of truth for backend communication.
 ///

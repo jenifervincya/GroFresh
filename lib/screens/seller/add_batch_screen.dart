@@ -39,15 +39,11 @@ class _AddBatchScreenState extends State<AddBatchScreen> {
       final cropName = _cropCtrl.text.trim();
       final quantityKg = double.parse(_qtyCtrl.text.trim());
 
-      await ApiService.instance.createBatch(
-        batchData: {
-          'cropName': cropName,
-          'quantityKg': quantityKg,
-          'imageUrl': _imagePath,
-          'status': 'listed',
-          'listedAt': DateTime.now().toIso8601String(),
-        },
-      );
+      await ApiService.instance.addBatch(
+  cropName: cropName,
+  quantityKg: quantityKg,
+  imageFilePath: _imagePath,
+);
 
       if (!mounted) return;
 
