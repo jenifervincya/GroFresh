@@ -1,11 +1,16 @@
 const crypto = require('crypto');
 const { EventEmitter } = require('events');
 const pool = require('../config/db');
+const kafkaClient = require('./kafka.client');
 
-// In-process event bus. Swap this for a real Kafka producer/consumer once
-// the event-streaming layer is wired up - other services (e.g. notifications)
-// can subscribe to 'PAYMENT_RELEASED' the same way regardless of transport.
+// In-process event bus, kept for same-process listeners (e.g. tests). Real
+// cross-service fan-out now goes through Kafka on grofresh.escrow.<batchId> -
+// see publishToKafka() below.
 const escrowEvents = new EventEmitter();
+
+function escrowTopicFor(batchId) {
+  return `grofresh.escrow.${batchId}`;
+}
 
 const GENESIS_HASH = '0'.repeat(64);
 
@@ -69,7 +74,16 @@ async function releasePaymentOnDelivery(batchId) {
 
   await pool.query(`UPDATE batches SET status = 'paid' WHERE id = $1`, [batchId]);
 
-  escrowEvents.emit('PAYMENT_RELEASED', { batchId, entryHash: hash });
+  const eventPayload = { batchId, entryHash: hash };
+  escrowEvents.emit('PAYMENT_RELEASED', eventPayload);
+
+  await kafkaClient.publish(escrowTopicFor(batchId), {
+    eventType: 'PAYMENT_RELEASED',
+    ...eventPayload,
+  }).catch((err) => {
+    console.error(`Failed to publish PAYMENT_RELEASED to Kafka for batch ${batchId}:`, err.message);
+  });
+
   return hash;
 }
 

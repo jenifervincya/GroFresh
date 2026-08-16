@@ -1,25 +1,61 @@
 const crypto = require('crypto');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 /**
- * Q4 decision: pre-signed upload URLs instead of raw multipart.
+ * Real S3 pre-signed upload URLs, replacing the local-storage stand-in.
  *
- * This is a local-storage stand-in until real object storage (S3/GCS/etc.)
- * is picked. It issues a short-lived upload token and object key with the
- * same shape a real pre-signed URL flow would use, so swapping in S3 later
- * only touches this file:
+ * Requires in .env:
+ *   AWS_REGION
+ *   AWS_ACCESS_KEY_ID
+ *   AWS_SECRET_ACCESS_KEY
+ *   S3_BUCKET_NAME
  *
- *   const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
- *   const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
- *   ... generate a real signed PUT URL against your bucket ...
+ * If those aren't set, falls back to the same local-URL stand-in as before
+ * so local/demo runs without an AWS account still work - set
+ * STORAGE_PROVIDER=s3 explicitly once real bucket credentials are in place.
  *
- * For now, the app should PUT the file to POST /uploads/:objectKey (add a
- * route + multer/raw-body handler if you want local uploads to actually
- * land on disk during development) or this can be swapped for real cloud
- * storage before this goes to buyers/farmers in production.
+ * Flow: this issues a short-lived signed PUT URL. The Flutter app PUTs the
+ * file directly to S3 using that URL (never touching our backend/server
+ * with the raw file bytes), then calls POST /kyc/submit with the same
+ * objectKey to record the metadata.
  */
-function createUploadTarget(prefix = 'kyc') {
+
+const s3Enabled =
+  process.env.STORAGE_PROVIDER === 's3' &&
+  process.env.AWS_REGION &&
+  process.env.AWS_ACCESS_KEY_ID &&
+  process.env.AWS_SECRET_ACCESS_KEY &&
+  process.env.S3_BUCKET_NAME;
+
+let s3Client = null;
+if (s3Enabled) {
+  s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
+}
+
+const UPLOAD_URL_TTL_SECONDS = 300; // 5 minutes to complete the PUT
+
+async function createUploadTarget(prefix = 'kyc') {
   const objectKey = `${prefix}/${crypto.randomUUID()}`;
-  const uploadUrl = `${process.env.UPLOAD_BASE_URL || 'http://localhost:4000'}/uploads/${objectKey}`;
+
+  if (!s3Enabled) {
+    // Local-storage stand-in fallback, same as before real S3 was wired up.
+    const uploadUrl = `${process.env.UPLOAD_BASE_URL || 'http://localhost:4000'}/uploads/${objectKey}`;
+    return { objectKey, uploadUrl };
+  }
+
+  const command = new PutObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: objectKey,
+  });
+  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: UPLOAD_URL_TTL_SECONDS });
+
   return { objectKey, uploadUrl };
 }
 

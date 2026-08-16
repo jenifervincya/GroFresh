@@ -66,3 +66,13 @@ const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
   console.log(`GroFresh backend listening on port ${PORT}`);
 });
+
+const kafkaClient = require('./services/kafka.client');
+process.on('SIGTERM', async () => {
+  await kafkaClient.shutdown();
+  server.close(() => process.exit(0));
+});
+process.on('SIGINT', async () => {
+  await kafkaClient.shutdown();
+  server.close(() => process.exit(0));
+});
