@@ -1,17 +1,40 @@
-# farmora
+# GroFresh (Farmora)
 
-A new Flutter project.
+A fair-chain agricultural marketplace connecting farmers directly to buyers —
+removing the middleman markup, verifying delivery before releasing payment,
+and staying accessible to farmers with low smartphone/digital literacy through
+voice and SMS.
 
-## Getting Started
+## The Problem
 
-This project is a starting point for a Flutter application.
+Farmers routinely lose income to information asymmetry: no visibility into
+fair market prices, no reliable way to verify trust with a buyer or
+middleman, no guarantee that payment follows delivery, and no path into a
+digital marketplace for those without smartphone access or literacy.
 
-A few resources to get you started if this is your first Flutter project:
+## What This Repo Contains
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The software side of the platform:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Reverse auction marketplace** — farmers list produce, buyers bid
+  competitively instead of a single middleman setting the price.
+- **AI-driven fair-price guidance** — an estimated fair price band per
+  batch, based on market conditions.
+- **Escrow-based payments** — buyer funds are held and only released once
+  delivery is confirmed via OTP, removing non-payment risk.
+- **Trust & reputation ledger** — a tamper-evident, hash-chained record of
+  every transaction, visible to both sides.
+- **Price journey transparency** — a full, visible history of how a batch's
+  price was formed, from listing to final sale.
+- **Voice, SMS & multilingual access** — so the app isn't the only way in.
+
+## Team & Ownership
+
+| Member | Area |
+|---|---|
+| Jeni | Backend core, Kafka, trust/ledger layer — auction logic, escrow hold-and-release, OTP-gated payment release, hash-chained ledger, reputation service |
+| Tamil | Mobile app — build & launch, registration/KYC flow, SMS/IVR templates |
+| Archana | DevOps, integration testing, hardware↔software integration lead |
+| Neha | AI/pricing — fair-price model, spoilage/quality scoring, negotiation agent |
+| Yogaprakash | Hardware — IoT batch tracker, weight sensor |
+| Harsha | Hardware — quality/freshness sensor, RFID/NFC checkpoint tags |

@@ -1,0 +1,24 @@
+{
+  "name": "grofresh-backend",
+  "version": "0.1.0",
+  "description": "GroFresh / Farmora backend - auth, batches, escrow, chat",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1111.0",
+    "@aws-sdk/s3-request-presigner": "^3.1111.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "kafkajs": "^2.2.4",
+    "pg": "^8.12.0",
+    "twilio": "^6.1.0",
+    "uuid": "^9.0.1",
+    "ws": "^8.18.0"
+  }
+}
