@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../theme/app_theme.dart';
+import '../core/theme/app_theme.dart';
 
 /// Opens the phone's native dialer pre-filled with [phoneNumber]. No
 /// in-app/VoIP calling — this is intentional: real in-app calling needs a
