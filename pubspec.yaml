@@ -1,0 +1,26 @@
+name: farmora
+description: GroFresh - Fair-Chain Agricultural Marketplace
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  url_launcher: ^6.3.0
+  # TODO(WIRING): add these once each flow is wired:
+  # image_picker: ^1.1.0        -> add-batch photo, KYC document photo
+  # geolocator: ^12.0.0         -> buyer nearest-first sort real coords
+  # flutter_localizations (sdk) -> multilingual UI (Hindi + regional)
+  # shared_preferences: ^2.2.0  -> persist auth token / session
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

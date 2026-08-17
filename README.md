@@ -37,4 +37,4 @@ The software side of the platform:
 | Archana | DevOps, integration testing, hardware↔software integration lead |
 | Neha | AI/pricing — fair-price model, spoilage/quality scoring, negotiation agent |
 | Yogaprakash | Hardware — IoT batch tracker, weight sensor |
-| Harsha | Hardware — quality/freshness sensor, RFID/NFC checkpoint tags |"
+| Harsha | Hardware — quality/freshness sensor, RFID/NFC checkpoint tags |
