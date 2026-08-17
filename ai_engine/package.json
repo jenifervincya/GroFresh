@@ -1,0 +1,16 @@
+{
+  "name": "grofresh-pricing-service",
+  "version": "0.1.0",
+  "description": "Rule-based fair-price estimation service for GroFresh/Farmora",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5",
+    "cors": "^2.8.5"
+  }
+}
