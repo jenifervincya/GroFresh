@@ -18,4 +18,10 @@ async function create({ phone, name, role }) {
   return rows[0];
 }
 
-module.exports = { findByPhone, findById, create };
+// Flips phone_verified to true. Called once, after the FIRST successful OTP
+// verify for a given user - never reset to false afterward.
+async function markPhoneVerified(userId) {
+  await pool.query(`UPDATE users SET phone_verified = true WHERE id = $1`, [userId]);
+}
+
+module.exports = { findByPhone, findById, create, markPhoneVerified };

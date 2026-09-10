@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
   address_lat DOUBLE PRECISION,
   address_lng DOUBLE PRECISION,
   kyc_status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (kyc_status IN ('pending', 'submitted', 'verified', 'rejected')),
+  -- Set true after the FIRST successful OTP verification at registration.
+  -- Once true, subsequent logins can skip the OTP step (see auth.controller.js login()).
+  phone_verified BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

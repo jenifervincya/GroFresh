@@ -45,7 +45,7 @@ async function requestOtp(req, res) {
 }
 
 // POST /auth/otp/verify
-// { phone, otp } -> { token, userId }
+// { phone, otp } -> { token, userId, phoneVerified }
 async function verifyOtp(req, res) {
   const { phone, otp } = req.body;
   if (!phone || !otp) {
@@ -62,8 +62,28 @@ async function verifyOtp(req, res) {
     return res.status(404).json({ error: 'no account found for this phone, register first' });
   }
 
+  // First successful OTP verify for this account -> mark phone as verified.
+  // From now on the app should persist the JWT (see AuthSession/shared_preferences
+  // on the app side) so the user isn't sent through OTP again on every open -
+  // only re-request OTP if the token is lost/expired (new device, reinstall).
+  if (!user.phone_verified) {
+    await userModel.markPhoneVerified(user.id);
+  }
+
   const token = signToken(user.id);
-  return res.status(200).json({ token, userId: user.id });
+  return res.status(200).json({ token, userId: user.id, phoneVerified: true });
 }
 
-module.exports = { register, requestOtp, verifyOtp };
+// POST /auth/token/refresh
+// Requires a currently-valid JWT (requireAuth middleware already ran).
+// Issues a fresh token with a renewed expiry, so a returning user with a
+// still-valid session never has to go through OTP again - this is the
+// "just login is enough next time" path. If the token has already expired,
+// requireAuth rejects the request before this handler runs, and the app
+// falls back to the OTP flow (request -> verify) as normal.
+async function refreshToken(req, res) {
+  const token = signToken(req.userId);
+  return res.status(200).json({ token, userId: req.userId });
+}
+
+module.exports = { register, requestOtp, verifyOtp, refreshToken };
